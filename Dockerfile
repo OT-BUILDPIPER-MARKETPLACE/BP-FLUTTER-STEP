@@ -9,4 +9,8 @@ ENV VALIDATION_FAILURE_ACTION WARNING
 
 COPY build.sh .
 
+RUN sudo apt-get update \
+ && sudo apt-get install -y jq \
+ && sudo rm -rf /var/lib/apt/lists/* 
+
 ENTRYPOINT [ "./build.sh" ]
