@@ -1,11 +1,11 @@
 FROM ghcr.io/cirruslabs/flutter:stable
 
-COPY BP-BASE-SHELL-STEPS/functions.sh .
-COPY BP-BASE-SHELL-STEPS/log-functions.sh .
+ADD BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/
 
 ENV ACTIVITY_SUB_TASK_CODE BP-TRIVY-TASK
 ENV SLEEP_DURATION 5s
 ENV VALIDATION_FAILURE_ACTION WARNING
+ENV INSTRUCTION "apk build"
 
 COPY build.sh .
 
