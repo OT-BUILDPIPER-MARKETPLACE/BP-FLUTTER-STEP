@@ -1,4 +1,4 @@
-FROM ghcr.io/cirruslabs/flutter:stable
+FROM ghcr.io/cirruslabs/flutter:3.7.7
 
 ADD BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/
 
