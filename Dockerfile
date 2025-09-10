@@ -8,12 +8,15 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user "buildpiper"
-RUN groupadd -g 1001 buildpiper && \
-    useradd -m -u 1001 -g buildpiper -s /bin/bash buildpiper && \
+RUN groupadd -g 65522 buildpiper && \
+    useradd -m -u 65522 -g buildpiper -s /bin/bash buildpiper && \
     echo "buildpiper ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     mkdir -p /opt/buildpiper/shell-functions && \
-    chown -R buildpiper:buildpiper /opt/buildpiper && \
-    chown -R buildpiper:buildpiper /home/buildpiper
+    chown -R buildpiper:buildpiper /opt/buildpiper /home/buildpiper && \
+    chown -R buildpiper:buildpiper /sdks/flutter
+
+# Mark flutter dir safe for Git
+RUN git config --system --add safe.directory /sdks/flutter
 
 # Add buildpiper shell functions
 COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/

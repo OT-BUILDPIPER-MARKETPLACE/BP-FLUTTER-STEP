@@ -2,6 +2,7 @@
 source /opt/buildpiper/shell-functions/functions.sh
 source /opt/buildpiper/shell-functions/log-functions.sh
 
+
 CODEBASE_LOCATION="${WORKSPACE}"/"${CODEBASE_DIR}"
 SLEEP_DURATION= 5
 logInfoMessage "I'll build the code available at [$CODEBASE_LOCATION]"
