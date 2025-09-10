@@ -3,11 +3,14 @@ source /opt/buildpiper/shell-functions/functions.sh
 source /opt/buildpiper/shell-functions/log-functions.sh
 
 CODEBASE_LOCATION="${WORKSPACE}"/"${CODEBASE_DIR}"
+SLEEP_DURATION= 5
 logInfoMessage "I'll build the code available at [$CODEBASE_LOCATION]"
-logInfoMessage "I'll execute instruction $INSTRUCTION"
 sleep  $SLEEP_DURATION
 
 cd  "${CODEBASE_LOCATION}"
+logInfoMessage "Running flutter pub get"
+flutter pub get
+logInfoMessage "I'll execute instruction $INSTRUCTION"
 flutter $INSTRUCTION
 TASK_STATUS=$?
 
