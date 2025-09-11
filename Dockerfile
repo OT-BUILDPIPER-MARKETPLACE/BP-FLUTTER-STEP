@@ -20,7 +20,7 @@ RUN git config --system --add safe.directory /sdks/flutter
 
 # Add buildpiper shell functions
 COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/
-
+RUN chown -R buildpiper:buildpiper /opt/android-sdk-linux
 # Environment variables
 ENV ACTIVITY_SUB_TASK_CODE="BP-FLUTTER-TASK" \
     SLEEP_DURATION="5s" \
