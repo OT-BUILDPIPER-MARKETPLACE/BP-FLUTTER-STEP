@@ -5,6 +5,7 @@ FROM ghcr.io/cirruslabs/flutter:3.32.4
 USER root
 RUN apt-get update -y && \
     apt-get install -y jq openjdk-17-jdk sudo && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user "buildpiper"
