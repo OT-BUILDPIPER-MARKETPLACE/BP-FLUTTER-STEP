@@ -1,43 +1,47 @@
-# Base image with Flutter 3.32.4
-FROM ghcr.io/cirruslabs/flutter:3.32.4
+FROM ubuntu:24.04
 
-# Install dependencies and JDK 17
-USER root
-RUN apt-get update -y && \
-    apt-get install -y jq openjdk-17-jdk sudo && \
-    rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Create non-root user "buildpiper"
+ENV FLUTTER_HOME=/opt/flutter
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV JAVA_HOME=/opt/jdk-17.0.17+10
+ENV PATH=${JAVA_HOME}/bin:${FLUTTER_HOME}/bin:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${PATH}
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    bash \
+    curl \
+    git \
+    unzip \
+    zip \
+    xz-utils \
+    libglu1-mesa \
+    ca-certificates \
+    jq \
+ && rm -rf /var/lib/apt/lists/*
+
+# Create BuildPiper user
 RUN groupadd -g 65522 buildpiper && \
-    useradd -m -u 65522 -g buildpiper -s /bin/bash buildpiper && \
-    echo "buildpiper ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-    mkdir -p /opt/buildpiper/shell-functions && \
-    chown -R buildpiper:buildpiper /opt/buildpiper /home/buildpiper && \
-    chown -R buildpiper:buildpiper /sdks/flutter
+    useradd -u 65522 -g 65522 -m -d /home/buildpiper -s /bin/bash buildpiper && \
+    mkdir -p \
+        /workspace \
+        /bp/data \
+        /bp/execution_dir \
+        /opt/buildpiper \
+        /bp/workspace && \
+    chown -R 65522:65522 \
+        /workspace \
+        /bp \
+        /opt/buildpiper \
+        /home/buildpiper
 
-# Mark flutter dir safe for Git
-RUN git config --system --add safe.directory /sdks/flutter
-
-# Add buildpiper shell functions
-COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/
-RUN chown -R buildpiper:buildpiper /opt/android-sdk-linux
-# Environment variables
-ENV ACTIVITY_SUB_TASK_CODE="BP-FLUTTER-TASK" \
-    SLEEP_DURATION="5s" \
-    VALIDATION_FAILURE_ACTION="WARNING" \
-    INSTRUCTION="build apk" \
-    JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64" \
-    PATH="$JAVA_HOME/bin:$PATH"
-
-# Switch to non-root user
-USER buildpiper
-WORKDIR /home/buildpiper
-
+# Copy BuildPiper shell functions
+COPY --chown=65522:65522 BP-BASE-SHELL-STEPS/ /home/buildpiper/shell-functions/
 # Copy build script
-COPY --chown=buildpiper:buildpiper build.sh .
+WORKDIR /workspace
+COPY --chown=buildpiper:buildpiper build.sh /build.sh
+RUN chmod +x /build.sh
 
-# Make script executable
-RUN chmod +x /home/buildpiper/build.sh
+USER 65522:65522
 
-# Entry point
-ENTRYPOINT ["./build.sh"]
+ENTRYPOINT ["/build.sh"]
