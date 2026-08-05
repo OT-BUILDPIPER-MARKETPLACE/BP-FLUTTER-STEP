@@ -40,12 +40,25 @@ if [[ ${TASK_STATUS} -eq 0 ]]; then
     fi
 fi
 
+
+export GRADLE_OPTS="-Dorg.gradle.daemon=false"
+export GRADLE_USER_HOME="${EXEC_DIR}/.gradle"
+
 # Step 3: Execute Flutter command
 if [[ ${TASK_STATUS} -eq 0 ]]; then
-    logInfoMessage "Executing: flutter ${INSTRUCTION}"
+    logInfoMessage "Executing: flutter ${APK_INSTRUCTION}"
 
-    if ! flutter ${INSTRUCTION}; then
-        logErrorMessage "flutter ${INSTRUCTION} failed!"
+    if ! flutter ${APK_INSTRUCTION}; then
+        logErrorMessage "flutter ${APK_INSTRUCTION} failed!"
+        TASK_STATUS=1
+    fi
+fi
+# Step 3: Execute Flutter command
+if [[ ${TASK_STATUS} -eq 0 ]]; then
+    logInfoMessage "Executing: flutter ${AAB_INSTRUCTION}"
+
+    if ! flutter ${AAB_INSTRUCTION}; then
+        logErrorMessage "flutter ${AAB_INSTRUCTION} failed!"
         TASK_STATUS=1
     fi
 fi
