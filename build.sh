@@ -42,7 +42,9 @@ fi
 
 
 export GRADLE_OPTS="-Dorg.gradle.daemon=false"
-export GRADLE_USER_HOME="${EXEC_DIR}/.gradle"
+export GRADLE_USER_HOME="${CODEBASE_LOCATION}/.gradle"
+logInfoMessage "GRADLE_USER_HOME=${GRADLE_USER_HOME}"
+mkdir -p "${GRADLE_USER_HOME}"
 
 # Step 3: Execute Flutter command
 if [[ ${TASK_STATUS} -eq 0 ]]; then
@@ -62,5 +64,9 @@ if [[ ${TASK_STATUS} -eq 0 ]]; then
         TASK_STATUS=1
     fi
 fi
+
+# Cleanup
+logInfoMessage "Cleaning up GRADLE_USER_HOME..."
+rm -rf "${GRADLE_USER_HOME}"
 
 saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
