@@ -22,9 +22,7 @@ logInfoMessage "Java Version: $(java -version 2>&1 | head -1)"
 logInfoMessage "I'll build the code available at [$CODEBASE_LOCATION]"
 sleep "${SLEEP_DURATION}"
 
-logInfoMessage "Coping key files in android/app dir"
-cp "/src/${COMPONENT_NAME}/key.properties" "android/app/key.properties" || exit 1
-cp "/src/${COMPONENT_NAME}/key.jks" "android/app/key.jks" || exit 1
+
 
 # Step 1: Change directory
 if ! cd "${CODEBASE_LOCATION}"; then
@@ -32,6 +30,10 @@ if ! cd "${CODEBASE_LOCATION}"; then
     TASK_STATUS=1
     saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
 fi
+
+logInfoMessage "Coping key files in android/app dir"
+cp "/src/${COMPONENT_NAME}/key.properties" "android/app/key.properties" || exit 1
+cp "/src/${COMPONENT_NAME}/key.jks" "android/app/key.jks" || exit 1
 
 # Step 2: Fetch dependencies
 if [[ ${TASK_STATUS} -eq 0 ]]; then
