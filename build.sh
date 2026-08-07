@@ -22,6 +22,10 @@ logInfoMessage "Java Version: $(java -version 2>&1 | head -1)"
 logInfoMessage "I'll build the code available at [$CODEBASE_LOCATION]"
 sleep "${SLEEP_DURATION}"
 
+logInfoMessage "Coping key files in android/app dir"
+cp "/src/${COMPONENT_NAME}/key.properties" "android/app/key.properties" || exit 1
+cp "/src/${COMPONENT_NAME}/key.jks" "android/app/key.jks" || exit 1
+
 # Step 1: Change directory
 if ! cd "${CODEBASE_LOCATION}"; then
     logErrorMessage "Failed to change directory to ${CODEBASE_LOCATION}"
