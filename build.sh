@@ -32,7 +32,7 @@ if ! cd "${CODEBASE_LOCATION}"; then
 fi
 
 logInfoMessage "Coping key files in android/app dir"
-cp "/src/${COMPONENT_NAME}/key.properties" "android/app/key.properties" || exit 1
+cp "/src/${COMPONENT_NAME}/key.properties" "android/key.properties" || exit 1
 cp "/src/${COMPONENT_NAME}/key.jks" "android/app/key.jks" || exit 1
 
 # Step 2: Fetch dependencies
