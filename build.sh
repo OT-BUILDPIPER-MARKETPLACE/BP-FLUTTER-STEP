@@ -31,9 +31,8 @@ if ! cd "${CODEBASE_LOCATION}"; then
     saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
 fi
 
-logInfoMessage "Coping key files in android/app dir"
-cp "/src/${COMPONENT_NAME}/key.properties" "android/key.properties" || exit 1
-cp "/src/${COMPONENT_NAME}/key.jks" "android/app/key.jks" || exit 1
+logInfoMessage "Coping key files in android/ dir"
+cp "/src/${COMPONENT_NAME}/"* "android/" || exit 1
 
 # Step 2: Fetch dependencies
 if [[ ${TASK_STATUS} -eq 0 ]]; then
@@ -54,19 +53,10 @@ mkdir -p "${GRADLE_USER_HOME}"
 
 # Step 3: Execute Flutter command
 if [[ ${TASK_STATUS} -eq 0 ]]; then
-    logInfoMessage "Executing: flutter ${APK_INSTRUCTION}"
+    logInfoMessage "Executing: flutter ${INSTRUCTION}"
 
-    if ! flutter ${APK_INSTRUCTION}; then
-        logErrorMessage "flutter ${APK_INSTRUCTION} failed!"
-        TASK_STATUS=1
-    fi
-fi
-# Step 3: Execute Flutter command
-if [[ ${TASK_STATUS} -eq 0 ]]; then
-    logInfoMessage "Executing: flutter ${AAB_INSTRUCTION}"
-
-    if ! flutter ${AAB_INSTRUCTION}; then
-        logErrorMessage "flutter ${AAB_INSTRUCTION} failed!"
+    if ! flutter ${INSTRUCTION}; then
+        logErrorMessage "flutter ${INSTRUCTION} failed!"
         TASK_STATUS=1
     fi
 fi
