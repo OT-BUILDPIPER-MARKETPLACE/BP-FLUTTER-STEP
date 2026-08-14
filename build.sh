@@ -32,7 +32,7 @@ if ! cd "${CODEBASE_LOCATION}"; then
 fi
 
 logInfoMessage "Coping key files in android/ dir"
-cp "/src/${COMPONENT_NAME}/"* "android/" || exit 1
+cp "/src/${COMPONENT_NAME}/playstore/"* "android/" || exit 1
 
 # Step 2: Fetch dependencies
 if [[ ${TASK_STATUS} -eq 0 ]]; then
