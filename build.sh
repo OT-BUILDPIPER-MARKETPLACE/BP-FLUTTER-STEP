@@ -31,7 +31,7 @@ if ! cd "${CODEBASE_LOCATION}"; then
     saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
 fi
 
-logInfoMessage "Coping key files in android/ dir"
+logInfoMessage "Copying key files in android/ dir"
 cp "/src/${COMPONENT_NAME}/playstore/"* "android/" || exit 1
 
 # Step 2: Fetch dependencies
@@ -45,19 +45,31 @@ if [[ ${TASK_STATUS} -eq 0 ]]; then
     fi
 fi
 
+# Step 3: Generate Flutter launcher icons
+if [[ ${TASK_STATUS} -eq 0 ]]; then
+    logInfoMessage "Generating Flutter launcher icons"
 
+    if ! flutter pub run flutter_launcher_icons:main; then
+        logErrorMessage "Flutter launcher icon generation failed!"
+        TASK_STATUS=1
+        saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
+    fi
+fi
+
+# Gradle configuration
 export GRADLE_OPTS="-Dorg.gradle.daemon=false"
 export GRADLE_USER_HOME="${CODEBASE_LOCATION}/.gradle"
 logInfoMessage "GRADLE_USER_HOME=${GRADLE_USER_HOME}"
 mkdir -p "${GRADLE_USER_HOME}"
 
-# Step 3: Execute Flutter command
+# Step 4: Execute Flutter command
 if [[ ${TASK_STATUS} -eq 0 ]]; then
     logInfoMessage "Executing: flutter ${INSTRUCTION}"
 
     if ! flutter ${INSTRUCTION}; then
         logErrorMessage "flutter ${INSTRUCTION} failed!"
         TASK_STATUS=1
+        saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
     fi
 fi
 
