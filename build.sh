@@ -2,6 +2,7 @@
 
 source /home/buildpiper/shell-functions/functions.sh
 source /home/buildpiper/shell-functions/log-functions.sh
+source /home/buildpiper/shell-functions/getDataFile.sh
 
 CODEBASE_LOCATION="${WORKSPACE}/${CODEBASE_DIR}"
 SLEEP_DURATION=5
@@ -46,14 +47,19 @@ if [[ ${TASK_STATUS} -eq 0 ]]; then
 fi
 
 # Step 3: Generate Flutter launcher icons
-if [[ ${TASK_STATUS} -eq 0 ]]; then
-    logInfoMessage "Generating Flutter launcher icons"
+
+ICON_GENERATE="${ICON_GENERATE:-FALSE}"
+
+if [[ "${TASK_STATUS}" -eq 0 && "${ICON_GENERATE^^}" == "TRUE" ]]; then
+    logInfoMessage "ICON_GENERATE is TRUE. Generating Flutter launcher icons."
 
     if ! flutter pub run flutter_launcher_icons:main; then
         logErrorMessage "Flutter launcher icon generation failed!"
         TASK_STATUS=1
         saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
     fi
+else
+    logInfoMessage "Skipping Flutter launcher icon generation. ICON_GENERATE=${ICON_GENERATE}"
 fi
 
 # Gradle configuration
