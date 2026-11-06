@@ -35,6 +35,26 @@ fi
 logInfoMessage "Copying key files in android/ dir"
 cp "/src/${COMPONENT_NAME}/playstore/"* "android/" || exit 1
 
+# Gradle configuration
+export GRADLE_OPTS="-Dorg.gradle.daemon=false"
+export GRADLE_USER_HOME="${CODEBASE_LOCATION}/.gradle"
+logInfoMessage "GRADLE_USER_HOME=${GRADLE_USER_HOME}"
+mkdir -p "${GRADLE_USER_HOME}"
+
+
+
+# Step 2: flutter clean
+if [[ ${TASK_STATUS} -eq 0 ]]; then
+    logInfoMessage "Running flutter clean"
+
+    if ! flutter clean; then
+        logErrorMessage "flutter clean failed!"
+        TASK_STATUS=1
+        saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
+    fi
+fi
+
+
 # Step 2: Fetch dependencies
 if [[ ${TASK_STATUS} -eq 0 ]]; then
     logInfoMessage "Running flutter pub get"
@@ -62,25 +82,31 @@ else
     logInfoMessage "Skipping Flutter launcher icon generation. ICON_GENERATE=${ICON_GENERATE}"
 fi
 
-# Gradle configuration
-export GRADLE_OPTS="-Dorg.gradle.daemon=false"
-export GRADLE_USER_HOME="${CODEBASE_LOCATION}/.gradle"
-logInfoMessage "GRADLE_USER_HOME=${GRADLE_USER_HOME}"
-mkdir -p "${GRADLE_USER_HOME}"
+# Step 4: Execute Flutter commands
 
-# Step 4: Execute Flutter command
 if [[ ${TASK_STATUS} -eq 0 ]]; then
-    logInfoMessage "Executing: flutter ${INSTRUCTION}"
 
-    if ! flutter ${INSTRUCTION}; then
-        logErrorMessage "flutter ${INSTRUCTION} failed!"
-        TASK_STATUS=1
-        saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
-    fi
+    logInfoMessage "Executing Flutter instructions: ${INSTRUCTION}"
+
+    IFS=',' read -ra FLUTTER_COMMANDS <<< "${INSTRUCTION}"
+
+    for FLUTTER_CMD in "${FLUTTER_COMMANDS[@]}"; do
+
+        # Remove leading and trailing whitespace
+        FLUTTER_CMD="$(echo "${FLUTTER_CMD}" | xargs)"
+
+        [[ -z "${FLUTTER_CMD}" ]] && continue
+
+        logInfoMessage "Executing: flutter ${FLUTTER_CMD}"
+
+        if ! flutter ${FLUTTER_CMD}; then
+            logErrorMessage "Flutter command failed: flutter ${FLUTTER_CMD}"
+            TASK_STATUS=1
+            saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
+            break
+        fi
+
+    done
 fi
-
-# Cleanup
-logInfoMessage "Cleaning up GRADLE_USER_HOME..."
-rm -rf "${GRADLE_USER_HOME}"
 
 saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
